@@ -69,17 +69,7 @@ public class BookServiceImpl implements BookService {
         try {
             PreparedStatement ps = con.prepareStatement(getAllBooksQuery);
             ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String bCode = rs.getString(1);
-                String bName = rs.getString(2);
-                String bAuthor = rs.getString(3);
-                int bPrice = rs.getInt(4);
-                int bQty = rs.getInt(5);
-
-                Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
-                books.add(book);
-            }
+            extractBooksFromResultSet(books, rs);
         } catch (SQLException e) {
 
         }
@@ -153,17 +143,7 @@ public class BookServiceImpl implements BookService {
                     BooksDBConstants.COLUMN_BARCODE + " IN ( " + commaSeperatedBookIds + " )";
             PreparedStatement ps = con.prepareStatement(getBooksByCommaSeperatedBookIdsQuery);
             ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String bCode = rs.getString(1);
-                String bName = rs.getString(2);
-                String bAuthor = rs.getString(3);
-                int bPrice = rs.getInt(4);
-                int bQty = rs.getInt(5);
-
-                Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
-                books.add(book);
-            }
+            extractBooksFromResultSet(books, rs);
         } catch (SQLException e) {
 
         }
@@ -188,6 +168,20 @@ public class BookServiceImpl implements BookService {
             e.printStackTrace();
         }
         return responseCode;
+    }
+
+    // Helper method to extract books from ResultSet
+    private void extractBooksFromResultSet(List<Book> books, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            String bCode = rs.getString(1);
+            String bName = rs.getString(2);
+            String bAuthor = rs.getString(3);
+            int bPrice = rs.getInt(4);
+            int bQty = rs.getInt(5);
+
+            Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
+            books.add(book);
+        }
     }
 
 }
