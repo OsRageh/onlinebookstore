@@ -1,8 +1,12 @@
 package com.bittercode.util;
 
 import java.io.PrintWriter;
+import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.bittercode.model.UserRole;
@@ -29,6 +33,22 @@ public class StoreUtil {
                 + "</script>");
         pw.println("<script>document.getElementById('" + activeTab + "').classList.add(\"active\");</script>");
 
+    }
+
+    /**
+     * Check if user is authenticated with required role, and redirect to login page if not
+     * @return true if user is authenticated, false if not
+     */
+    public static boolean isUserAuthenticated(UserRole role, HttpSession session, 
+                                            HttpServletRequest req, HttpServletResponse res, 
+                                            PrintWriter pw, String loginPage) throws ServletException, IOException {
+        if (!isLoggedIn(role, session)) {
+            RequestDispatcher rd = req.getRequestDispatcher(loginPage);
+            rd.include(req, res);
+            pw.println("<table class=\"tab\"><tr><td>Please Login First to Continue!!</td></tr></table>");
+            return false;
+        }
+        return true;
     }
 
     /**

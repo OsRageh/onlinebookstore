@@ -22,10 +22,7 @@ public class RemoveBookServlet extends HttpServlet {
     public void service(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
         PrintWriter pw = res.getWriter();
         res.setContentType("text/html");
-        if (!StoreUtil.isLoggedIn(UserRole.SELLER, req.getSession())) {
-            RequestDispatcher rd = req.getRequestDispatcher("SellerLogin.html");
-            rd.include(req, res);
-            pw.println("<table class=\"tab\"><tr><td>Please Login First to Continue!!</td></tr></table>");
+        if (!StoreUtil.isUserAuthenticated(UserRole.SELLER, req.getSession(), req, res, pw, "SellerLogin.html")) {
             return;
         }
 
