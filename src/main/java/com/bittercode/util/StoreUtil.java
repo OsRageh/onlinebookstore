@@ -1,8 +1,12 @@
 package com.bittercode.util;
 
 import java.io.PrintWriter;
+import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.bittercode.model.UserRole;
@@ -78,5 +82,19 @@ public class StoreUtil {
             }
         }
 
+    }
+    
+    /**
+     * Verify if seller is logged in and handle redirection if not
+     * @return true if user is logged in, false if redirected due to not being logged in
+     */
+    public static boolean verifySellerLogin(HttpServletRequest req, HttpServletResponse res, PrintWriter pw) throws ServletException, IOException {
+        if (!isLoggedIn(UserRole.SELLER, req.getSession())) {
+            RequestDispatcher rd = req.getRequestDispatcher("SellerLogin.html");
+            rd.include(req, res);
+            pw.println("<table class=\"tab\"><tr><td>Please Login First to Continue!!</td></tr></table>");
+            return false;
+        }
+        return true;
     }
 }

@@ -68,18 +68,7 @@ public class BookServiceImpl implements BookService {
 
         try {
             PreparedStatement ps = con.prepareStatement(getAllBooksQuery);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String bCode = rs.getString(1);
-                String bName = rs.getString(2);
-                String bAuthor = rs.getString(3);
-                int bPrice = rs.getInt(4);
-                int bQty = rs.getInt(5);
-
-                Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
-                books.add(book);
-            }
+            processBookResultSet(ps.executeQuery(), books);
         } catch (SQLException e) {
 
         }
@@ -152,18 +141,7 @@ public class BookServiceImpl implements BookService {
                     + " WHERE " +
                     BooksDBConstants.COLUMN_BARCODE + " IN ( " + commaSeperatedBookIds + " )";
             PreparedStatement ps = con.prepareStatement(getBooksByCommaSeperatedBookIdsQuery);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                String bCode = rs.getString(1);
-                String bName = rs.getString(2);
-                String bAuthor = rs.getString(3);
-                int bPrice = rs.getInt(4);
-                int bQty = rs.getInt(5);
-
-                Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
-                books.add(book);
-            }
+            processBookResultSet(ps.executeQuery(), books);
         } catch (SQLException e) {
 
         }
@@ -188,6 +166,25 @@ public class BookServiceImpl implements BookService {
             e.printStackTrace();
         }
         return responseCode;
+    }
+
+    /**
+     * Helper method to process ResultSet and extract Book objects
+     * @param rs The ResultSet containing book data
+     * @param books The list to which Book objects should be added
+     * @throws SQLException If there is an error processing the ResultSet
+     */
+    private void processBookResultSet(ResultSet rs, List<Book> books) throws SQLException {
+        while (rs.next()) {
+            String bCode = rs.getString(1);
+            String bName = rs.getString(2);
+            String bAuthor = rs.getString(3);
+            int bPrice = rs.getInt(4);
+            int bQty = rs.getInt(5);
+
+            Book book = new Book(bCode, bName, bAuthor, bPrice, bQty);
+            books.add(book);
+        }
     }
 
 }

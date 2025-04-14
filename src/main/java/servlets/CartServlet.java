@@ -25,33 +25,22 @@ public class CartServlet extends HttpServlet {
     BookService bookService = new BookServiceImpl();
 
     public void service(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-        PrintWriter pw = res.getWriter();
-        res.setContentType(BookStoreConstants.CONTENT_TYPE_TEXT_HTML);
+        PrintWriter pw = StoreUtil.initializeHtmlResponse(res);
 
-        // Check if Customer is logged In
-        if (!StoreUtil.isLoggedIn(UserRole.CUSTOMER, req.getSession())) {
-            RequestDispatcher rd = req.getRequestDispatcher("CustomerLogin.html");
-            rd.include(req, res);
-            pw.println("<table class=\"tab\"><tr><td>Please Login First to Continue!!</td></tr></table>");
+        if (!StoreUtil.verifyCustomerLogin(req, res, pw)) {
             return;
         }
+
+        StoreUtil.setupCustomerHomePage(req, res, pw, "cart");
+
         try {
-            // Add/Remove Item from the cart if requested
-            // store the comma separated bookIds of cart in the session
             StoreUtil.updateCartItems(req);
 
             HttpSession session = req.getSession();
             String bookIds = "";
             if (session.getAttribute("items") != null)
-                bookIds = (String) session.getAttribute("items");// read comma separated bookIds from session
+                bookIds = (String) session.getAttribute("items");
 
-            RequestDispatcher rd = req.getRequestDispatcher("CustomerHome.html");
-            rd.include(req, res);
-
-            // Set the active tab as cart
-            StoreUtil.setActiveTab(pw, "cart");
-
-            // Read the books from the database with the respective bookIds
             List<Book> books = bookService.getBooksByCommaSeperatedBookIds(bookIds);
             List<Cart> cartItems = new ArrayList<Cart>();
             pw.println("<div id='topmid' style='background-color:grey'>Shopping Cart</div>");
@@ -81,7 +70,6 @@ public class CartServlet extends HttpServlet {
                 pw.println(getRowData(cart));
             }
 
-            // set cartItems and amountToPay in the session
             session.setAttribute("cartItems", cartItems);
             session.setAttribute("amountToPay", amountToPay);
 
